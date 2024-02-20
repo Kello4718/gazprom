@@ -1,92 +1,83 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import * as echarts from 'echarts';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, FC } from 'react';
 
 import { forceResizeCharts } from './UtilsForCharts';
-
-interface IOnEvents {
-	type: string;
-	func: Function;
+import { IOnEvents } from '../interfaces/interfaces';
+interface ReactEChartsProps {
+    option: any; // We leave any, since not all typed echarts options are needed to work
+    onEvents?: IOnEvents;
+    style?: CSSProperties;
+    settings?: echarts.SetOptionOpts;
+    loading?: boolean;
+    theme?: 'light' | 'dark';
+    forceResize?: boolean;
 }
 
-export interface ReactEChartsProps {
-	option: any; // We leave any, since not all typed echarts options are needed to work
-	onEvents?: IOnEvents;
-	style?: CSSProperties;
-	settings?: echarts.SetOptionOpts;
-	loading?: boolean;
-	theme?: 'light' | 'dark';
-	forceResize?: boolean;
-}
+const ReactECharts: FC<ReactEChartsProps> = ({
+    option,
+    onEvents,
+    style,
+    settings,
+    loading,
+    theme,
+    forceResize = true,
+}) => {
+    const chartRef = useRef<HTMLDivElement>(null);
+    useEffect(() => {
+        // Initialize chart
+        let chart: echarts.ECharts | undefined;
 
-export interface ILegendselectchangedParams {
-	name: string;
-	selected: Record<string, boolean>;
-	type: string;
-}
+        if (chartRef.current !== null) {
+            chart = echarts.init(chartRef.current, theme);
+        }
 
-export function ReactECharts({
-	option,
-	onEvents,
-	style,
-	settings,
-	loading,
-	theme,
-	forceResize = true,
-}: ReactEChartsProps): JSX.Element {
-	const chartRef = useRef<HTMLDivElement>(null);
-	useEffect(() => {
-		// Initialize chart
-		let chart: echarts.ECharts | undefined;
+        // Add chart resize listener
+        // ResizeObserver is leading to a bit janky UX
+        function resizeChart() {
+            chart?.resize();
+        }
 
-		if (chartRef.current !== null) {
-			chart = echarts.init(chartRef.current, theme);
-		}
+        window.addEventListener('resize', resizeChart);
 
-		// Add chart resize listener
-		// ResizeObserver is leading to a bit janky UX
-		function resizeChart() {
-			chart?.resize();
-		}
+        let observer: MutationObserver | false | undefined = false;
 
-		window.addEventListener('resize', resizeChart);
+        if (forceResize) observer = forceResizeCharts(resizeChart);
 
-		let observer: MutationObserver | false | undefined = false;
+        // Return cleanup function
+        return () => {
+            chart?.dispose();
+            window.removeEventListener('resize', resizeChart);
+        };
+    }, [theme]);
 
-		if (forceResize) observer = forceResizeCharts(resizeChart);
+    useEffect(() => {
+        // Update chart
+        if (chartRef.current !== null) {
+            const chart = echarts.getInstanceByDom(chartRef.current);
+            chart?.setOption(option, settings);
+            chart?.on(onEvents?.type!, function (params: any) {
+                onEvents?.func(params);
+                chart?.setOption(option, settings);
+            });
+        }
+    }, [option, settings, onEvents, theme]); // Whenever theme changes we need to add option and setting due to it being deleted in cleanup function
 
-		// Return cleanup function
-		return () => {
-			chart?.dispose();
-			window.removeEventListener('resize', resizeChart);
-		};
-	}, [theme]);
+    useEffect(() => {
+        // Update chart
+        if (chartRef.current !== null) {
+            const chart = echarts.getInstanceByDom(chartRef.current);
 
-	useEffect(() => {
-		// Update chart
-		if (chartRef.current !== null) {
-			const chart = echarts.getInstanceByDom(chartRef.current);
-			chart?.setOption(option, settings);
-			chart?.on(onEvents?.type!, function (params: any) {
-				onEvents?.func(params);
-				chart?.setOption(option, settings);
-			});
-		}
-	}, [option, settings, onEvents, theme]); // Whenever theme changes we need to add option and setting due to it being deleted in cleanup function
+            loading === true ? chart?.showLoading() : chart?.hideLoading();
+        }
+    }, [loading, theme]);
 
-	useEffect(() => {
-		// Update chart
-		if (chartRef.current !== null) {
-			const chart = echarts.getInstanceByDom(chartRef.current);
+    return (
+        <div
+            ref={chartRef}
+            style={{ width: '100%', height: '100%', ...style }}
+        />
+    );
+};
 
-			loading === true ? chart?.showLoading() : chart?.hideLoading();
-		}
-	}, [loading, theme]);
-
-	return (
-		<div
-			ref={chartRef}
-			style={{ width: '100%', height: '100%', ...style }}
-		/>
-	);
-}
+export default ReactECharts;

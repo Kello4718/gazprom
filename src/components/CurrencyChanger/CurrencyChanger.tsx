@@ -4,8 +4,7 @@ import { useState } from 'react';
 import styles from './CurrencyChanger.module.css';
 import { useAppDispatch } from '../../app/hooks';
 import { updateState } from '../../slice/currencySlice';
-
-type Item = { name: string; currencySymbol: string; indicator: string };
+import { CurrencyChangerItem } from '../../types/types';
 
 const items = [
     { name: 'dollar', currencySymbol: '$', indicator: 'Курс доллара' },
@@ -14,7 +13,7 @@ const items = [
 ];
 
 const CurrencyChanger = () => {
-    const [value, setValue] = useState<Item>(items[0]);
+    const [value, setValue] = useState<CurrencyChangerItem>(items[0]);
     const dispatch = useAppDispatch();
     return (
         <div className="currency">

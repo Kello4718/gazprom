@@ -14,4 +14,5 @@ export const currencyApi = createApi({
     }),
 });
 
-export const { useGetCurrencyDataQuery } = currencyApi;
+export const { useGetCurrencyDataQuery, useLazyGetCurrencyDataQuery } =
+    currencyApi;

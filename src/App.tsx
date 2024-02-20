@@ -1,33 +1,19 @@
-import { ReactECharts } from './Echarts/ReactECharts';
+import ReactECharts from './Echarts/ReactECharts';
 import { cnMixFlex } from '@consta/uikit/MixFlex';
 import { Text } from '@consta/uikit/Text';
+import { Spin, Button } from 'antd';
 
 import CurrencyChanger from './components/CurrencyChanger/CurrencyChanger';
 import Average from './components/Avarage';
 import { getCurrency } from './slice/currencySlice';
 import { useAppSelector } from './app/hooks';
-import { useGetCurrencyDataQuery } from './api/currencyApi';
-
-type ExchangeRateText = {
-    dollar: string;
-    euro: string;
-    yuan: string;
-};
-
-type CurrencyDataObject = {
-    date: string;
-    month: string;
-    indicator: string;
-    value: number;
-    id: string;
-};
-
-type CurrencyData = {
-    data: CurrencyDataObject[];
-};
+import {
+    useGetCurrencyDataQuery,
+    useLazyGetCurrencyDataQuery,
+} from './api/currencyApi';
+import { CurrencyDataObject, ExchangeRateText } from './types/types';
 
 const getOptions = (indicator: string, xData: string[], yData: number[]) => ({
-    color: ['#f38b00'],
     tooltip: {
         show: true,
         trigger: 'axis',
@@ -50,31 +36,28 @@ const getOptions = (indicator: string, xData: string[], yData: number[]) => ({
         axisLabel: {
             show: true,
             margin: 30,
-            fontFamily: 'Open sans Regular', // todo
             fontStyle: 'normal',
             fontSize: 10,
             fontWeight: 400,
             lineHeight: 15,
             align: 'center',
-            color: 'var(--grey02alpha60)', // todo
             padding: [0, 0, 0, 0],
         },
         boundaryGap: false,
     },
     yAxis: {
-        type: 'value', // отображает тип данных
-        offset: 20, // сдвиг данных по оси Х
+        type: 'value',
+        offset: 20,
         min: yData && Math.min(...yData) - 5,
         max: yData && Math.max(...yData) + 5,
         axisTick: {
-            show: true, // показать/скрыть черточку
-            inside: true, // черточка справа
-            length: 10, // длина черточки
+            show: true,
+            inside: true,
+            length: 10,
             alignWithLabel: true,
         },
         axisLabel: {
             show: true,
-            interval: 2, // TODO
             showMinLabel: false,
             fontFamily: 'inter',
             fontStyle: 'normal',
@@ -108,56 +91,130 @@ const exchangeRateText = {
 
 const App = () => {
     const { currency, indicator } = useAppSelector(getCurrency);
-    const { data } = useGetCurrencyDataQuery<CurrencyData>({});
-    const filteredData = data?.filter((item) => item.indicator === indicator);
-    const axisXData = filteredData?.map((item) => item.month);
-    const axisYData = filteredData?.map((item) => item.value);
+    const { data, isFetching, isError, isSuccess } =
+        useGetCurrencyDataQuery(null);
+    const filteredData = data?.filter(
+        (item: CurrencyDataObject) => item.indicator === indicator
+    );
+    const axisXData = filteredData?.map(
+        (item: CurrencyDataObject) => item.month
+    );
+    const axisYData = filteredData?.map(
+        (item: CurrencyDataObject) => item.value
+    );
+    const title = `КУРС ${
+        exchangeRateText[currency as keyof ExchangeRateText]
+    }/₽`;
     const average = (
-        axisYData?.reduce((acc, item) => acc + item, 0) / axisYData?.length
+        axisYData?.reduce((acc: number, item: number) => acc + item, 0) /
+        axisYData?.length
     ).toFixed(1);
+
+    const [getData] = useLazyGetCurrencyDataQuery();
 
     return (
         <>
-            <div
-                className={cnMixFlex({
-                    justify: 'space-between',
-                    align: 'center',
-                })}
-            >
-                <Text
-                    as="h1"
-                    font="primary"
-                    lineHeight="l"
-                    weight="bold"
-                    transform="uppercase"
-                    view="primary"
-                    color="var(--grey02)"
+            {isFetching && (
+                <div
+                    className={cnMixFlex({
+                        justify: 'center',
+                        align: 'center',
+                    })}
                     style={{
-                        fontFamily: 'Inter Bold',
-                        fontSize: '20px',
-                        lineHeight: '150%',
-                        margin: 0,
+                        width: '100%',
+                        height: '100vh',
                     }}
                 >
-                    {`КУРС ${
-                        exchangeRateText[currency as keyof ExchangeRateText]
-                    }/₽`}
-                </Text>
-                <CurrencyChanger />
-            </div>
-            <div
-                className={cnMixFlex({
-                    justify: 'space-between',
-                    align: 'center',
-                })}
-                style={{ padding: '0 14px' }}
-            >
-                <ReactECharts
-                    option={getOptions(indicator, axisXData, axisYData)}
-                    style={{ width: 'min(100%, 968px)', height: '318px' }}
-                />
-                <Average average={Number(average)} />
-            </div>
+                    <Spin size="large">
+                        <div className="content" />
+                    </Spin>
+                </div>
+            )}
+            {isError && (
+                <div
+                    className={cnMixFlex({
+                        justify: 'center',
+                        align: 'center',
+                        direction: 'column',
+                    })}
+                    style={{
+                        width: '100%',
+                        height: '100vh',
+                        gap: '30px 0',
+                    }}
+                >
+                    <Text
+                        as="h1"
+                        font="primary"
+                        lineHeight="l"
+                        weight="bold"
+                        transform="uppercase"
+                        view="primary"
+                        color="var(--grey02)"
+                        style={{
+                            fontFamily: 'Inter Bold',
+                            fontSize: '20px',
+                            lineHeight: '150%',
+                            margin: 0,
+                        }}
+                    >
+                        Похоже тут какие-то проблемы с интернет соединением 😒
+                    </Text>
+                    <Button
+                        type="primary"
+                        onClick={() => {
+                            getData(null);
+                        }}
+                    >
+                        Загрузить данные
+                    </Button>
+                </div>
+            )}
+            {isSuccess && (
+                <>
+                    <div
+                        className={cnMixFlex({
+                            justify: 'space-between',
+                            align: 'center',
+                        })}
+                    >
+                        <Text
+                            as="h1"
+                            font="primary"
+                            lineHeight="l"
+                            weight="bold"
+                            transform="uppercase"
+                            view="primary"
+                            color="var(--grey02)"
+                            style={{
+                                fontFamily: 'Inter Bold',
+                                fontSize: '20px',
+                                lineHeight: '150%',
+                                margin: 0,
+                            }}
+                        >
+                            {title}
+                        </Text>
+                        <CurrencyChanger />
+                    </div>
+                    <div
+                        className={cnMixFlex({
+                            justify: 'space-between',
+                            align: 'center',
+                        })}
+                        style={{ padding: '0 14px' }}
+                    >
+                        <ReactECharts
+                            option={getOptions(indicator, axisXData, axisYData)}
+                            style={{
+                                width: 'min(100%, 968px)',
+                                height: '318px',
+                            }}
+                        />
+                        <Average average={Number(average)} />
+                    </div>
+                </>
+            )}
         </>
     );
 };
