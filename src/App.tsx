@@ -1,297 +1,165 @@
-import React from 'react';
 import { ReactECharts } from './Echarts/ReactECharts';
+import { cnMixFlex } from '@consta/uikit/MixFlex';
+import { Text } from '@consta/uikit/Text';
 
-// const mockData = [
-// 	{
-// 		date: '2016-02-01',
-// 		month: 'фев 2016',
-// 		indicator: 'Курс доллара',
-// 		value: 72,
-// 	},
-// 	{
-// 		date: '2016-03-02',
-// 		month: 'мар 2016',
-// 		indicator: 'Курс доллара',
-// 		value: 80,
-// 	},
-// 	{
-// 		date: '2016-04-01',
-// 		month: 'апр 2016',
-// 		indicator: 'Курс доллара',
-// 		value: 77,
-// 	},
-// 	{
-// 		date: '2016-05-02',
-// 		month: 'май 2016',
-// 		indicator: 'Курс доллара',
-// 		value: 78,
-// 	},
-// 	{
-// 		date: '2016-02-01',
-// 		month: 'июн 2016',
-// 		indicator: 'Курс доллара',
-// 		value: 77,
-// 	},
-// 	{
-// 		date: '2016-03-02',
-// 		month: 'июл 2016',
-// 		indicator: 'Курс доллара',
-// 		value: 76,
-// 	},
-// 	{
-// 		date: '2016-04-01',
-// 		month: 'авг 2016',
-// 		indicator: 'Курс доллара',
-// 		value: 81,
-// 	},
-// 	{
-// 		date: '2016-05-02',
-// 		month: 'сент 2016',
-// 		indicator: 'Курс доллара',
-// 		value: 82,
-// 	},
+import CurrencyChanger from './components/CurrencyChanger/CurrencyChanger';
+import Average from './components/Avarage';
+import { getCurrency } from './slice/currencySlice';
+import { useAppSelector } from './app/hooks';
+import { useGetCurrencyDataQuery } from './api/currencyApi';
 
-// 	{
-// 		date: '2016-02-01',
-// 		month: 'фев 2016',
-// 		indicator: 'Курс евро',
-// 		value: 90,
-// 	},
-// 	{
-// 		date: '2016-03-02',
-// 		month: 'мар 2016',
-// 		indicator: 'Курс евро',
-// 		value: 88,
-// 	},
-// 	{
-// 		date: '2016-04-01',
-// 		month: 'апр 2016',
-// 		indicator: 'Курс евро',
-// 		value: 87,
-// 	},
-// 	{
-// 		date: '2016-05-02',
-// 		month: 'май 2016',
-// 		indicator: 'Курс евро',
-// 		value: 91,
-// 	},
-// 	{
-// 		date: '2016-02-01',
-// 		month: 'июн 2016',
-// 		indicator: 'Курс евро',
-// 		value: 92,
-// 	},
-// 	{
-// 		date: '2016-03-02',
-// 		month: 'июл 2016',
-// 		indicator: 'Курс евро',
-// 		value: 93,
-// 	},
-// 	{
-// 		date: '2016-04-01',
-// 		month: 'авг 2016',
-// 		indicator: 'Курс евро',
-// 		value: 89,
-// 	},
-// 	{
-// 		date: '2016-05-02',
-// 		month: 'сент 2016',
-// 		indicator: 'Курс евро',
-// 		value: 88,
-// 	},
-
-// 	{
-// 		date: '2016-02-01',
-// 		month: 'фев 2016',
-// 		indicator: 'Курс юаня',
-// 		value: 22,
-// 	},
-// 	{
-// 		date: '2016-03-02',
-// 		month: 'мар 2016',
-// 		indicator: 'Курс юаня',
-// 		value: 24,
-// 	},
-// 	{
-// 		date: '2016-04-01',
-// 		month: 'апр 2016',
-// 		indicator: 'Курс юаня',
-// 		value: 25,
-// 	},
-// 	{
-// 		date: '2016-05-02',
-// 		month: 'май 2016',
-// 		indicator: 'Курс юаня',
-// 		value: 21,
-// 	},
-// 	{
-// 		date: '2016-02-01',
-// 		month: 'июн 2016',
-// 		indicator: 'Курс юаня',
-// 		value: 23,
-// 	},
-// 	{
-// 		date: '2016-03-02',
-// 		month: 'июл 2016',
-// 		indicator: 'Курс юаня',
-// 		value: 24,
-// 	},
-// 	{
-// 		date: '2016-04-01',
-// 		month: 'авг 2016',
-// 		indicator: 'Курс юаня',
-// 		value: 26,
-// 	},
-// 	{
-// 		date: '2016-05-02',
-// 		month: 'сент 2016',
-// 		indicator: 'Курс юаня',
-// 		value: 19,
-// 	},
-// ];
-
-type MinMax = {
-	min: number;
-	max: number;
+type ExchangeRateText = {
+    dollar: string;
+    euro: string;
+    yuan: string;
 };
 
-const option = {
-	color: ['#F38B00'],
-	tooltip: {
-		show: true,
-		trigger: 'axis',
-		// axisPointer: { snap: true },
-	},
-	xAxis: {
-		type: 'category',
-		data: [
-			'фев 2016',
-			'мар 2016',
-			'апр 2016',
-			'май 2016',
-			'июн 2016',
-			'июл 2016',
-			'авг 2016',
-			'сент 2016',
-		],
-		offset: 0,
-		axisLine: {
-			show: false,
-			symbol: 'test',
-		},
-		axisTick: {
-			show: false,
-		},
-		axisLabel: {
-			show: true,
-			margin: 30,
-			fontFamily: 'open sans',
-			fontStyle: 'normal',
-			fontSize: 10,
-			fontWeight: 400,
-			lineHeight: 15,
-			align: 'center',
-			color: '#00203360',
-			padding: [0, 0, 0, 0],
-		},
-		boundaryGap: false,
-	},
-	yAxis: {
-		type: 'value', // отображает тип данных
-		offset: 20, // сдвиг данных по оси Х
-		min: 72,
-		max: function (value: MinMax) {
-			return value.max + 2;
-		},
-		axisTick: {
-			show: true, // показать/скрыть черточку
-			inside: true, // черточка справа
-			length: 10, // длина черточки
-			alignWithLabel: true,
-		},
-		axisLabel: {
-			show: true,
-			interval: 2, // TODO
-			showMinLabel: false,
-			fontFamily: 'inter',
-			fontStyle: 'normal',
-			fontSize: 10,
-			fontWeight: 400,
-			lineHeight: 15,
-			color: '#667985',
-			padding: [0, 0, 0, 0],
-		},
-	},
-	series: [
-		{
-			name: 'Курс доллара',
-			type: 'line',
-			data: [72, 80, 77, 78, 77, 76, 81, 82],
-			symbol: 'none',
-			lineStyle: {
-				type: 'solid',
-				width: 2,
-				color: '#F38B00',
-			},
-		},
-	],
+type CurrencyDataObject = {
+    date: string;
+    month: string;
+    indicator: string;
+    value: number;
+    id: string;
 };
 
-// {
-// 		date: '2016-02-01',
-// 		month: 'фев 2016',
-// 		indicator: 'Курс доллара',
-// 		value: 72,
-// 	},
-// 	{
-// 		date: '2016-03-02',
-// 		month: 'мар 2016',
-// 		indicator: 'Курс доллара',
-// 		value: 80,
-// 	},
-// 	{
-// 		date: '2016-04-01',
-// 		month: 'апр 2016',
-// 		indicator: 'Курс доллара',
-// 		value: 77,
-// 	},
-// 	{
-// 		date: '2016-05-02',
-// 		month: 'май 2016',
-// 		indicator: 'Курс доллара',
-// 		value: 78,
-// 	},
-// 	{
-// 		date: '2016-02-01',
-// 		month: 'июн 2016',
-// 		indicator: 'Курс доллара',
-// 		value: 77,
-// 	},
-// 	{
-// 		date: '2016-03-02',
-// 		month: 'июл 2016',
-// 		indicator: 'Курс доллара',
-// 		value: 76,
-// 	},
-// 	{
-// 		date: '2016-04-01',
-// 		month: 'авг 2016',
-// 		indicator: 'Курс доллара',
-// 		value: 81,
-// 	},
-// 	{
-// 		date: '2016-05-02',
-// 		month: 'сент 2016',
-// 		indicator: 'Курс доллара',
-// 		value: 82,
-// 	},
+type CurrencyData = {
+    data: CurrencyDataObject[];
+};
 
-function App() {
-	return (
-		<div>
-			<ReactECharts option={option} style={{ height: '50vh' }} />
-		</div>
-	);
-}
+const getOptions = (indicator: string, xData: string[], yData: number[]) => ({
+    color: ['#f38b00'],
+    tooltip: {
+        show: true,
+        trigger: 'axis',
+        className: 'tooltip',
+        formatter: `
+                <span class="tooltip__date">{b} год</span><br>
+                <span class="tooltip__currency">{a}</span> <span class="tooltip__value">{c}₽</span>
+            `,
+    },
+    xAxis: {
+        type: 'category',
+        data: xData,
+        offset: 0,
+        axisLine: {
+            show: false,
+        },
+        axisTick: {
+            show: false,
+        },
+        axisLabel: {
+            show: true,
+            margin: 30,
+            fontFamily: 'Open sans Regular', // todo
+            fontStyle: 'normal',
+            fontSize: 10,
+            fontWeight: 400,
+            lineHeight: 15,
+            align: 'center',
+            color: 'var(--grey02alpha60)', // todo
+            padding: [0, 0, 0, 0],
+        },
+        boundaryGap: false,
+    },
+    yAxis: {
+        type: 'value', // отображает тип данных
+        offset: 20, // сдвиг данных по оси Х
+        min: yData && Math.min(...yData) - 5,
+        max: yData && Math.max(...yData) + 5,
+        axisTick: {
+            show: true, // показать/скрыть черточку
+            inside: true, // черточка справа
+            length: 10, // длина черточки
+            alignWithLabel: true,
+        },
+        axisLabel: {
+            show: true,
+            interval: 2, // TODO
+            showMinLabel: false,
+            fontFamily: 'inter',
+            fontStyle: 'normal',
+            fontSize: 10,
+            fontWeight: 400,
+            lineHeight: 15,
+            color: 'var(--grey01)',
+            padding: [0, 0, 0, 0],
+        },
+    },
+    series: [
+        {
+            name: indicator,
+            data: yData,
+            type: 'line',
+            symbol: 'none',
+            lineStyle: {
+                type: 'solid',
+                width: 2,
+                color: '#f38b00',
+            },
+        },
+    ],
+});
+
+const exchangeRateText = {
+    dollar: 'ДОЛЛАРА, $',
+    euro: 'ЕВРО, €',
+    yuan: 'ЮАНЯ, ¥',
+} as ExchangeRateText;
+
+const App = () => {
+    const { currency, indicator } = useAppSelector(getCurrency);
+    const { data } = useGetCurrencyDataQuery<CurrencyData>({});
+    const filteredData = data?.filter((item) => item.indicator === indicator);
+    const axisXData = filteredData?.map((item) => item.month);
+    const axisYData = filteredData?.map((item) => item.value);
+    const average = (
+        axisYData?.reduce((acc, item) => acc + item, 0) / axisYData?.length
+    ).toFixed(1);
+
+    return (
+        <>
+            <div
+                className={cnMixFlex({
+                    justify: 'space-between',
+                    align: 'center',
+                })}
+            >
+                <Text
+                    as="h1"
+                    font="primary"
+                    lineHeight="l"
+                    weight="bold"
+                    transform="uppercase"
+                    view="primary"
+                    color="var(--grey02)"
+                    style={{
+                        fontFamily: 'Inter Bold',
+                        fontSize: '20px',
+                        lineHeight: '150%',
+                        margin: 0,
+                    }}
+                >
+                    {`КУРС ${
+                        exchangeRateText[currency as keyof ExchangeRateText]
+                    }/₽`}
+                </Text>
+                <CurrencyChanger />
+            </div>
+            <div
+                className={cnMixFlex({
+                    justify: 'space-between',
+                    align: 'center',
+                })}
+                style={{ padding: '0 14px' }}
+            >
+                <ReactECharts
+                    option={getOptions(indicator, axisXData, axisYData)}
+                    style={{ width: 'min(100%, 968px)', height: '318px' }}
+                />
+                <Average average={Number(average)} />
+            </div>
+        </>
+    );
+};
 
 export default App;

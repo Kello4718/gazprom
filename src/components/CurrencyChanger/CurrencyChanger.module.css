@@ -1,0 +1,41 @@
+.CurrencyGroup {
+    width: max-content;
+    border: 1px solid #00426928;
+    border-radius: 4px;
+}
+
+.CurrencyGroup label {
+    font-size: 13px;
+    font-weight: 400;
+    position: relative;
+}
+
+.CurrencyGroup label::before {
+    content: '';
+    width: 1px;
+    height: 15px;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    background: #00426928;
+}
+
+.CurrencyGroup label:first-child:before {
+    content: none;
+}
+
+.CurrencyGroup label input + span {
+    width: 33px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: var(--grey02);
+}
+
+.CurrencyGroup label input:checked + span {
+    color: var(--white00);
+    background: var(--activeTabBackground);
+    border-radius: 4px;
+}

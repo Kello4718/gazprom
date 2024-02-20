@@ -1,0 +1,96 @@
+@font-face {
+    font-family: 'Inter Regular';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: local('Inter Regular'),
+        url('./fonts/Inter-Regular.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Inter Bold';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: local('Inter Bold'), url('./fonts/Inter-Bold.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'Open Sans Regular';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: local('Open Sans Regular'),
+        url('./fonts/OpenSans-Regular.woff2') format('woff2');
+}
+
+:root {
+    --main-color: #f38b00;
+    --grey01: #667985;
+    --grey02: #002033;
+    --grey02alpha60: #00203360;
+    --activeTabBackground: #0078D2;
+    --white00: #ffffff;
+}
+
+html,
+body {
+    width: min(100%, 1200px);
+    height: 100%;
+    font-family: 'Inter Regular', 'Arial', sans-serif;
+    font-size: 16px;
+    line-height: 150%;
+    padding: 0;
+    margin: 0 auto;
+}
+
+body {
+    padding: 8px 8px 8px 13px;
+}
+
+.tooltip {
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    gap: 8px 0;
+    padding: 8px;
+}
+
+.tooltip__date {
+    width: 100%;
+    font-family: 'Inter Bold', 'Arial', sans-serif;
+    font-size: 12px;
+    line-height: 150%;
+    font-weight: 700;
+    color: var(--grey02);
+}
+
+.tooltip__currency {
+    font-family: 'Inter Regular', 'Arial', sans-serif;
+    font-size: 12px;
+    line-height: 150%;
+    font-weight: 400;
+    position: relative;
+    color: var(--grey01);
+    padding: 0 0 0 20px;
+}
+
+.tooltip__currency::before {
+    content: '';
+    width: 12px;
+    aspect-ratio: 1;
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    background: var(--main-color);
+    border-radius: 50%;
+}
+
+.tooltip__value {
+    font-family: 'Inter Bold', 'Arial', sans-serif;
+    font-size: 12px;
+    line-height: 150%;
+    font-weight: 700;
+    color: var(--grey02);
+}

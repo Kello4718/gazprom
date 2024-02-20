@@ -1,7 +1,8 @@
 {
-  "semi": true,
-  "semicolons": true,
-  "trailingComma": "es5",
-  "singleQuote": true,
-  "endOfLine": "auto"
+    "semi": true,
+    "semicolons": true,
+    "trailingComma": "es5",
+    "singleQuote": true,
+    "endOfLine": "auto",
+    "tabWidth": 4
 }
