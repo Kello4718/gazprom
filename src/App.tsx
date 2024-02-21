@@ -13,6 +13,7 @@ import {
 } from './api/currencyApi';
 import { CurrencyDataObject, ExchangeRateText } from './types/types';
 
+// Настройки для графика
 const getOptions = (indicator: string, xData: string[], yData: number[]) => ({
     tooltip: {
         show: true,
@@ -114,6 +115,7 @@ const App = () => {
 
     return (
         <>
+            {/* Пока данные грузятся почему бы не показать какой-нибудь loader? */}
             {isFetching && (
                 <div
                     className={cnMixFlex({
@@ -130,6 +132,7 @@ const App = () => {
                     </Spin>
                 </div>
             )}
+            {/* А вот в случае ошибки здорово бы было показать пользователю, что что-то произошло и попытаться починить это */}
             {isError && (
                 <div
                     className={cnMixFlex({
@@ -170,6 +173,7 @@ const App = () => {
                     </Button>
                 </div>
             )}
+            {/* Ну и конечно же в случае успеха показать то, зачем он сюда и пришел */}
             {isSuccess && (
                 <>
                     <div
